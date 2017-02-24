@@ -1,8 +1,40 @@
-# SqlEventAnalyzer
+# Overview
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sql_event_analyzer`. To experiment with that code, run `bin/console` for an interactive prompt.
+Consume Rails SQL events and generates an HTML overview for the SQL utilization.
 
-TODO: Delete this and the text above, and describe your gem
+## Usage
+
+### Around any calls
+```ruby
+SqlEventAnalyzer.start(name: 'report1') do
+  # Some code that does a lot of SQL
+end
+```
+
+### View the Results
+
+A directory will be created at the root of the project directry from which Rails
+is running. All results are contained there as HTML files. Open them in your
+web browser.
+
+```sh
+find tmp/sql_event_analyzer/
+open tmp/sql_event_analyzer/report1.html
+```
+
+### Around a Rails Controller
+```ruby
+class ApplicationController < ActionController::Base
+
+  # @see http://guides.rubyonrails.org/action_controller_overview.html#after-filters-and-around-filters
+  around_action :capture_sql_filter
+
+  def capture_sql_filter(&block)
+    stats_file_name = "#{params[:controller]}-#{params[:action]}"
+    SqlEventAnalyzer.start(name: stats_file_name, &block)
+  end
+end
+```
 
 ## Installation
 
@@ -20,9 +52,6 @@ Or install it yourself as:
 
     $ gem install sql_event_analyzer
 
-## Usage
-
-TODO: Write usage instructions here
 
 ## Development
 
@@ -32,7 +61,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sql_event_analyzer.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ddrscott/sql_event_analyzer.
 
 
 ## License

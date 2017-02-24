@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" integrity="sha256-xrr4HH5eSY+cFz4SH7ja/LaAi9qcEdjMpeMP49/iOLs=" crossorigin="anonymous"></script>
+    <style>
+      textarea {
+        width: 70em;
+        font-family: monospace;
+        font-size: .8em;
+        height: 15em;
+        overflow-x: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Overall</h2>
+    <div class="row">
+      <div class="col-sm-6">
+      <table class="table table-condensed">
+        <tr>
+          <th>uniq callers</th>
+          <th>total calls</th>
+          <th>total millis</th>
+        </tr>
+        <tr>
+          <td><%= stats.size %></td>
+          <td><%= stats.values.inject(0){|agg, r| r[:count] + agg } %> </td>
+          <td><%= stats.values.inject(0){|agg, r| r[:duration] + agg }.round %> </td>
+        </tr>
+      </table>
+      </div>
+    </div>
+    <h2>Details</h2>
+    <table class="table table-condensed">
+      <tr>
+        <th>order</th>
+        <th>calls</th>
+        <th>millis</th>
+        <th>SQL</th>
+        <th>Explain</th>
+        <th>caller</th>
+      </tr>
+      <% stats.each do |k, stat| %>
+        <tr>
+          <td><%= stat[:order] %></td>
+          <td><%= stat[:count] %></td>
+          <td><%= stat[:duration].round %></td>
+          <td><textarea><%= debug_rb(k.first) %><%= pretty_sql(stat[:payload][:sql]) %></textarea></td>
+          <td><textarea><%= explain(stat[:payload]) %></textarea></td>
+          <td><textarea><%= k.map{|m| trim_caller(m)}.join("\\n") %></textarea></td>
+        </tr>
+      <% end %>
+    </table>
+  </body>
+</html>
