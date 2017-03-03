@@ -89,6 +89,7 @@ class SqlEventAnalyzer
   end
 
   def debug_rb(c)
+    return unless c
     first = trim_caller(c)
     file, line = if first =~ /(.*\.rb):(\d+)/
                    [$1, $2]
